@@ -4,7 +4,7 @@ const rollDice = () => Math.floor(Math.random() * 6) + 1;
 
 export class Player {
         name: string;
-        socket: Socket;
+        private socket: Socket;
         dice: [number, number, number, number, number]
 
         constructor(name: string, socket: Socket) {

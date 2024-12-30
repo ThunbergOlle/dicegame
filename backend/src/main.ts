@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/rooms', (_req, res) => {
-        res.send({ rooms });
+        res.send(Object.keys(rooms));
 })
 
 app.get('/room/:id', (req, res) => {
