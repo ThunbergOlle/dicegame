@@ -20,6 +20,7 @@ export class Player {
                 this.socket.emit('dice', this.dice)
         }
 
+
 }
 type GameRound = {
         currentPlayer: string;
@@ -58,6 +59,10 @@ export class Game {
                 this.server.to(this.roomName).emit('players', this.players.map(player => player.name))
         }
 
+        getPlayer(socketId: string) {
+                return this.players.find(player => player.socket.id === socketId)
+        }
+
         nextRound() {
                 this.players.forEach(player => player.roll())
 
@@ -68,5 +73,24 @@ export class Game {
                 this.server.to(this.roomName).emit('round', this.round)
         }
 
+        nextPlayer() {
+                const currentPlayerIndex = this.players.findIndex(player => player.name === this.round.currentPlayer)
 
+                if (currentPlayerIndex === this.players.length - 1) {
+                        this.round.currentPlayer = this.players[0].name
+                } else {
+                        this.round.currentPlayer = this.players[currentPlayerIndex + 1].name
+                }
+
+                this.server.to(this.roomName).emit('round', this.round)
+        }
+
+        start() {
+                this.started = true
+                this.server.to(this.roomName).emit('startGame')
+
+                sleep(1000).then(this.nextRound)
+        }
 }
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))

@@ -37,8 +37,11 @@ const rooms: {
 } = {}
 
 
-io.on('connection', (socket) => {
+
+io.on('connection', (socket: socketio.Socket) => {
+        let room: string;
         console.log('User connected');
+
 
         socket.on('getRooms', () => {
                 socket.emit('rooms', Object.keys(rooms));
@@ -49,22 +52,36 @@ io.on('connection', (socket) => {
 
         });
 
-        socket.on('setName', (name) => {
-                console.log('Name:', name);
-        })
-
-        socket.on('joinRoom', (room) => {
-                socket.join(room);
-
-                if (!rooms[room]) {
-                        rooms[room] = new Game(io, room);
+        socket.on('setName', (name: string) => {
+                const player = rooms[room].getPlayer(socket.id);
+                if (!player) {
+                        throw new Error('Player not found');
                 }
 
-
-                rooms[room].addPlayer(new Player('Player', socket));
-
+                player.name = name;
         })
 
+        socket.on('joinRoom', (joinRoom: string) => {
+                room = joinRoom;
+                socket.join(joinRoom);
+
+                if (!rooms[joinRoom]) {
+                        rooms[joinRoom] = new Game(io, joinRoom);
+                }
+
+                if (rooms[joinRoom].started) {
+                        throw new Error('Game already started');
+                }
+
+                rooms[joinRoom].addPlayer(new Player('Player', socket));
+        })
+
+        socket.on('startGame', () => {
+                if (!room) {
+                        throw new Error('Room not set');
+                }
+                rooms[room].start()
+        })
 });
 
 server.listen(4000, () => {
