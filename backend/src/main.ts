@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import * as socketio from 'socket.io';
+import { Game, Player } from './game';
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,11 @@ app.get('/rooms', (_req, res) => {
         res.send({ rooms });
 })
 
+app.get('/room/:id', (req, res) => {
+        const room = req.params.id;
+        res.send({ players: rooms[room].players });
+})
+
 
 const server = http.createServer(app);
 const io = new socketio.Server(server, {
@@ -25,19 +31,15 @@ const io = new socketio.Server(server, {
         },
 });
 
-type Player = {
-        name: string;
-        socketId: string;
-        dice: [number, number, number, number, number]
-        //health: number
-}
 
-const rooms: { [key: string]: { players: Player[] } } = {}
-
+const rooms: {
+        [key: string]: Game
+} = {}
 
 
 io.on('connection', (socket) => {
         console.log('User connected');
+
 
         socket.on('disconnect', async () => {
                 console.log('User disconnected');
@@ -47,19 +49,19 @@ io.on('connection', (socket) => {
         socket.on('setName', (name) => {
                 console.log('Name:', name);
         })
+
         socket.on('joinRoom', (room) => {
+                socket.join(room);
+
                 if (!rooms[room]) {
-                        rooms[room] = { players: [] }
+                        rooms[room] = new Game(io, room);
                 }
 
-                rooms[room].players.push({
-                        name: 'Player',
-                        socketId: socket.id,
-                        dice: [0, 0, 0, 0, 0]
-                })
 
-                socket.join(room);
+                rooms[room].addPlayer(new Player('Player', socket));
+
         })
+
 });
 
 server.listen(4000, () => {
