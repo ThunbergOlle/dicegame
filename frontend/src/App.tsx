@@ -1,33 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+import { socket } from './socket'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isConnected, setIsConnected] = useState(socket.connected)
+  const [rooms, setRooms] = useState([])
+
+  useEffect(() => {
+    function onConnect() {
+      setIsConnected(true)
+    }
+    socket.on('connect', onConnect);
+
+    getRooms();
+    socket.on('rooms', (rooms) => {
+      setRooms(rooms);
+    });
+
+    return () => {
+      socket.off('connect', onConnect);
+    }
+  }, [])
+
+  function joinRoom() {
+    socket.emit('joinRoom', 'room1');
+  }
+
+  function getRooms() {
+    socket.emit('getRooms');
+  }
+
+  function createRoom() {
+    // Create a new room
+    let room = prompt('Enter room name');
+
+    if (room) {
+      socket.emit('joinRoom', room);
+    }
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>Dice Game</h1>
+      <button onClick={createRoom}>
+        Create Room
+      </button>
+      <div className="rooms">
+        {rooms.map((room) => (
+          <li onClick={() => console.log("test")} style={{ cursor: 'pointer' }}>
+            {room}
+          </li>
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
