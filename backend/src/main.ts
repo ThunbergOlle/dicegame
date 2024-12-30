@@ -40,6 +40,9 @@ const rooms: {
 io.on('connection', (socket) => {
         console.log('User connected');
 
+        socket.on('getRooms', () => {
+                socket.emit('rooms', Object.keys(rooms));
+        });
 
         socket.on('disconnect', async () => {
                 console.log('User disconnected');
