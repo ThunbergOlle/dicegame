@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
+import { useLocation } from "react-router-dom";
 
 export default function Game() {
+  const location = useLocation();
+  const roomName = location.state.roomName;
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
@@ -16,7 +19,7 @@ export default function Game() {
 
   return (
     <div>
-      <h1>Game</h1>
+      <h1>{roomName}</h1>
       {players.map((player) => (
         <div key={player}>{player["name"]}</div>
       ))}
