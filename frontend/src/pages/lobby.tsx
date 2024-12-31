@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useLocation } from "react-router-dom";
 
-export default function Game() {
+export default function Lobby() {
   const location = useLocation();
   const roomName = location.state.roomName;
   const [players, setPlayers] = useState([]);

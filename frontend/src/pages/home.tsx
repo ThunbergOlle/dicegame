@@ -26,7 +26,7 @@ export default function Home() {
 
   function joinRoom(roomName: string) {
     socket.emit('joinRoom', roomName);
-    navigate('/game', { state: { roomName } });
+    navigate('/lobby', { state: { roomName } });
   }
 
   function getRooms() {

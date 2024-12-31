@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom"
-import Game from "./pages/game"
 import Home from "./pages/home"
+import Lobby from "./pages/lobby"
 
 export default function App() {
 
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/game" element={<Game />} />
+      <Route path="/lobby" element={<Lobby />} />
     </Routes>
 
   )
