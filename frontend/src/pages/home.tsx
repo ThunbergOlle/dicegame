@@ -27,7 +27,7 @@ export default function Home() {
       return;
     }
     socket.emit('joinRoom', roomName);
-    navigate('/lobby', { state: { roomName } });
+    navigate('/lobby', { state: { roomName, userName } });
   }
 
   function getRooms() {
