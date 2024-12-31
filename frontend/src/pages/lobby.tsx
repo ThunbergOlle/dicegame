@@ -17,9 +17,15 @@ export default function Lobby() {
     }
   }, []);
 
+  function startGame() {
+    socket.emit('');
+  }
+
   return (
     <div>
       <h1>{roomName}</h1>
+      <button onClick={() => startGame()}>Start game</button>
+      <h2>Players:</h2>
       {players.map((player) => (
         <div key={player}>{player["name"]}</div>
       ))}
