@@ -1,30 +1,31 @@
-import { useEffect, useState } from 'react'
-import { socket } from '../socket'
-import { useNavigate } from 'react-router-dom'
-import "../App.css"
+import { useEffect, useState } from 'react';
+import { socket } from '../socket';
+import { useNavigate } from 'react-router-dom';
+import '../App.css';
 
 export default function Home() {
-  const [isConnected, setIsConnected] = useState(socket.connected)
-  const [rooms, setRooms] = useState([])
-  const navigate = useNavigate()
+  const [rooms, setRooms] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true)
-    }
-    socket.on('connect', onConnect);
+    socket.emit('getRooms');
 
-    getRooms();
-    socket.on('rooms', (rooms) => {
+    function onRooms(rooms: string[]) {
       setRooms(rooms);
-    });
+    }
+
+    socket.on('rooms', onRooms);
 
     return () => {
-      socket.off('connect', onConnect);
-    }
-  }, [])
+      socket.off('rooms', onRooms);
+    };
+  }, []);
 
   function joinRoom(roomName: string) {
+    const userName = prompt('Enter your name');
+    if (!userName) {
+      return;
+    }
     socket.emit('joinRoom', roomName);
     navigate('/lobby', { state: { roomName } });
   }
@@ -34,7 +35,7 @@ export default function Home() {
   }
 
   function createRoom() {
-    let room = prompt('Enter room name');
+    const room = prompt('Enter room name');
 
     if (room) {
       joinRoom(room);
@@ -44,9 +45,7 @@ export default function Home() {
   return (
     <>
       <h1>Dice Game</h1>
-      <button onClick={createRoom}>
-        Create Room
-      </button>
+      <button onClick={createRoom}>Create Room</button>
       <div className="rooms">
         {rooms.map((room) => (
           <li onClick={() => joinRoom(room)} style={{ cursor: 'pointer' }} key={room}>
@@ -54,8 +53,7 @@ export default function Home() {
           </li>
         ))}
       </div>
-      <footer>Completely original game by OsbyGamingInc.AB</footer>
+      <footer>Completely original game by OsbyGamingInc.AB ©️</footer>
     </>
-  )
+  );
 }
-
