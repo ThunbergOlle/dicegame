@@ -22,8 +22,12 @@ export default function Home() {
   }, []);
 
   function joinRoom(roomName: string) {
+    const userName = prompt('Enter your name');
+    if (!userName) {
+      return;
+    }
     socket.emit('joinRoom', roomName);
-    navigate('/game');
+    navigate('/game', { state: { roomName, userName } });
   }
 
   function createRoom() {
