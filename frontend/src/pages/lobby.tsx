@@ -2,14 +2,25 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useLocation, useNavigate } from "react-router-dom";
 
+interface Player {
+  name: string;
+  dice: [number, number, number, number, number];
+}
+
 export default function Lobby() {
   const location = useLocation();
   const navigate = useNavigate();
   const roomName = location.state.roomName;
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<Array<Player>>([]);
 
   useEffect(() => {
-    socket.on('players', (players) => {
+    socket.emit('getPlayers');
+
+    function onPlayers(players: Array<Player>) {
+      setPlayers(players);
+    }
+
+    socket.on('players', () => {
       setPlayers(players);
     });
 

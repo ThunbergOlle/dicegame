@@ -70,6 +70,10 @@ io.on('connection', (socket: socketio.Socket) => {
     rooms[joinRoom].addPlayer(new Player('Player', socket));
   });
 
+  socket.on('getPlayers', () => {
+    socket.emit('players', rooms[room].players);
+  });
+
   socket.on('startGame', () => {
     if (!room) {
       throw new Error('Room not set');
