@@ -19,7 +19,7 @@ export default function Lobby() {
   }, []);
 
   function startGame() {
-    socket.emit('');
+    socket.emit('startGame');
     navigate('/lobby/game');
   }
 
