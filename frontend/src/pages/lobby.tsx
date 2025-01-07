@@ -11,21 +11,20 @@ export default function Lobby() {
   const location = useLocation();
   const navigate = useNavigate();
   const roomName = location.state.roomName;
-  const [players, setPlayers] = useState<Array<Player>>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     socket.emit('getPlayers');
 
-    function onPlayers(players: Array<Player>) {
+    function onPlayers(players: Player[]) {
+      console.log(players);
       setPlayers(players);
     }
 
-    socket.on('players', () => {
-      setPlayers(players);
-    });
+    socket.on('players', onPlayers);
 
     return () => {
-      socket.off('players');
+      socket.off('players', onPlayers);
     }
   }, []);
 
@@ -39,9 +38,9 @@ export default function Lobby() {
       <h1>{roomName}</h1>
       <button onClick={() => startGame()}>Start Game</button>
       <h2>Players:</h2>
-      {players.map((player) => (
-        <div key={player}>{player["name"]}</div>
-      ))}
+         {players.map((player: Player, index: any) => (
+          <div key={index}>{player.name}</div>
+         ))}
     </div>
   );
 }
