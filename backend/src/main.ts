@@ -15,6 +15,17 @@ app.get('/', (req, res) => {
 
 app.get('/rooms', (_req, res) => {
   res.send(Object.keys(rooms));
+  console.log(rooms);
+});
+
+app.get('/room/:name', (req, res) => {
+  const roomName = req.params.name;
+  const room = rooms[roomName];
+  if (room) {
+    res.send({ players: room.players });
+  } else {
+    res.status(404).send({ error: 'Room not found' });
+  }
 });
 
 app.get('/room/:id', (req, res) => {
@@ -71,7 +82,14 @@ io.on('connection', (socket: socketio.Socket) => {
   });
 
   socket.on('getPlayers', () => {
-    socket.emit('players', rooms[room].players);
+    if (!room || !rooms[room]) {
+      return socket.emit('players', []);
+    }
+    const players = rooms[room].players.map((player) => ({
+      name: player.name,
+      dice: player.dice,
+    }));
+    socket.emit('players', players);
   });
 
   socket.on('startGame', () => {
