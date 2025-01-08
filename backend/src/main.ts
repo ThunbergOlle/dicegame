@@ -3,7 +3,7 @@ import express from 'express';
 import http from 'http';
 import * as socketio from 'socket.io';
 import { Game, Player } from './game';
-import roomRoutes from './routes/room-routes';
+import routes from './routes/routes';
 
 const app = express();
 app.use(express.json());
@@ -14,11 +14,7 @@ const rooms: {
   [key: string]: Game;
 } = {};
 
-app.get('/', (req, res) => {
-  res.send({ uptime: process.uptime() });
-});
-
-roomRoutes(app, rooms);
+routes(app, rooms);
 
 const server = http.createServer(app);
 const io = new socketio.Server(server, {
