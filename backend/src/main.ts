@@ -2,8 +2,9 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import * as socketio from 'socket.io';
-import { Game, Player } from './game';
+import { Game } from './game';
 import routes from './routes/routes';
+import sockets from './sockets/sockets';
 
 const app = express();
 app.use(express.json());
@@ -24,49 +25,7 @@ const io = new socketio.Server(server, {
   },
 });
 
-io.on('connection', (socket: socketio.Socket) => {
-  let room: string;
-  console.log('User connected');
-
-  socket.on('getRooms', () => {
-    socket.emit('rooms', Object.keys(rooms));
-  });
-
-  socket.on('disconnect', async () => {
-    console.log('User disconnected');
-  });
-
-  socket.on('setName', (name: string) => {
-    const player = rooms[room].getPlayer(socket.id);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-
-    player.name = name;
-  });
-
-  socket.on('joinRoom', (joinRoom: string) => {
-    room = joinRoom;
-    socket.join(joinRoom);
-
-    if (!rooms[joinRoom]) {
-      rooms[joinRoom] = new Game(io, joinRoom);
-    }
-
-    if (rooms[joinRoom].started) {
-      throw new Error('Game already started');
-    }
-
-    rooms[joinRoom].addPlayer(new Player('Player', socket));
-  });
-
-  socket.on('startGame', () => {
-    if (!room) {
-      throw new Error('Room not set');
-    }
-    rooms[room].start();
-  });
-});
+io.on('connection', (socket: socketio.Socket) => { sockets(socket, io, rooms) });
 
 server.listen(4000, () => {
   console.log('Server listening on port 4000');
