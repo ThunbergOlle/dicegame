@@ -2,8 +2,8 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import * as socketio from 'socket.io';
-import { Game } from './game';
-import routes from './routes/routes';
+import { rooms } from './rooms';
+import { roomRouter } from './routes/room-routes';
 import sockets from './sockets/sockets';
 
 const app = express();
@@ -11,11 +11,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-const rooms: {
-  [key: string]: Game;
-} = {};
+app.use(roomRouter);
 
-routes(app, rooms);
+app.get('/', (req, res) => {
+  res.send({ uptime: process.uptime() });
+});
 
 const server = http.createServer(app);
 const io = new socketio.Server(server, {
@@ -25,7 +25,9 @@ const io = new socketio.Server(server, {
   },
 });
 
-io.on('connection', (socket: socketio.Socket) => { sockets(socket, io, rooms) });
+io.on('connection', (socket: socketio.Socket) => {
+  sockets(socket, io, rooms);
+});
 
 server.listen(4000, () => {
   console.log('Server listening on port 4000');
