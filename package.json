@@ -1,0 +1,12 @@
+{
+  "name": "dicegame",
+  "private": true,
+  "workspaces": [
+    "./backend/*",
+    "./frontend/*"
+  ],
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2"
+  }
+}
