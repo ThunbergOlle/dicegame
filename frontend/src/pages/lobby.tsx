@@ -30,7 +30,7 @@ export default function Lobby() {
 
   function startGame() {
     socket.emit('startGame');
-    navigate('/lobby/game');
+    navigate('/game');
   }
 
   return (
