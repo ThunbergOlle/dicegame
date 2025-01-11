@@ -14,10 +14,16 @@ export default function Home() {
       setRooms(rooms);
     }
 
+    function onRoomUpdate(room: string) {
+      setRooms((rooms) => [...rooms, room]);
+    }
+
     socket.on('rooms', onRooms);
+    socket.on('roomUpdate', onRoomUpdate);
 
     return () => {
       socket.off('rooms', onRooms);
+      socket.off('roomUpdate', onRoomUpdate);
     };
   }, []);
 
