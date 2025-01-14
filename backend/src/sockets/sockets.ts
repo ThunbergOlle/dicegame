@@ -2,7 +2,7 @@ import * as socketio from 'socket.io';
 import { Game } from '../game';
 import { Player } from '../game';
 
-export default function sockets(socket: socketio.Socket, io: socketio.Server, rooms: { [key: string]: Game}) {
+export default function sockets(socket: socketio.Socket, io: socketio.Server, rooms: { [key: string]: Game }) {
   let room: string;
   console.log('User connected');
 
@@ -16,6 +16,7 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
 
     if (!rooms[joinRoom]) {
       rooms[joinRoom] = new Game(io, joinRoom);
+      io.emit('roomUpdate', joinRoom);
     }
 
     if (rooms[joinRoom].started) {
@@ -28,7 +29,7 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
   socket.on('getRooms', () => {
     socket.emit('rooms', Object.keys(rooms));
   });
-  
+
   socket.on('setName', (name: string) => {
     const player = rooms[room].getPlayer(socket.id);
     if (!player) {
