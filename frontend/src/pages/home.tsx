@@ -32,7 +32,8 @@ export default function Home() {
     if (!userName) {
       return;
     }
-    socket.emit('joinRoom', roomName);
+    const dataPacket = { roomName: roomName, userName: userName };
+    socket.emit('joinRoom', dataPacket);
     navigate('/lobby', { state: { roomName, userName } });
   }
 
