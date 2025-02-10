@@ -16,15 +16,17 @@ export default function Lobby() {
   useEffect(() => {
     socket.emit('getPlayers');
 
-    function onPlayers(players: Player[]) {
-      console.log(players);
-      setPlayers(players);
+    function onPlayers(recievedPlayers: Player[]) {
+      console.log("Excisting Players: ", players);
+      console.log("Recieved Players: ", recievedPlayers);
+      setPlayers((players) => [...players, ...recievedPlayers]);
     }
 
     socket.on('players', onPlayers);
 
     return () => {
       socket.off('players', onPlayers);
+      console.log("retunred playtes: ", players);
     }
   }, []);
 
@@ -38,9 +40,11 @@ export default function Lobby() {
       <h1>{roomName}</h1>
       <button onClick={() => startGame()}>Start Game</button>
       <h2>Players:</h2>
-         {players.map((player: Player, index: any) => (
-          <div key={index}>{player.name}</div>
-         ))}
+      {players.map((player) => (
+        <div key={player.name}>
+          <p>{player.name}</p>
+        </div>
+      ))}
     </div>
   );
 }
