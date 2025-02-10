@@ -35,7 +35,10 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     // if (!room) {
     //   throw new Error('Room not set');
     // }
-    const players = rooms[room].players.map((player) => player.name);
+    const players = rooms[room].players.map((player) => ({
+      name: player.name,
+      dice: player.dice,
+    }));
     console.log(players)
     socket.emit('players', players);
   });
