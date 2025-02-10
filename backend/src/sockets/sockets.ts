@@ -10,7 +10,8 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     console.log('User disconnected');
   });
 
-  socket.on('joinRoom', (joinRoom: string) => {
+  socket.on('joinRoom', (dataPacket: {joinRoom: string; userName: string}) => {
+    const { joinRoom, userName } = dataPacket;
     room = joinRoom;
     socket.join(joinRoom);
 
@@ -23,11 +24,20 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
       throw new Error('Game already started');
     }
 
-    rooms[joinRoom].addPlayer(new Player('Player', socket));
+    rooms[joinRoom].addPlayer(new Player(userName, socket));
   });
 
   socket.on('getRooms', () => {
     socket.emit('rooms', Object.keys(rooms));
+  });
+
+  socket.on('getPlayers', () => {
+    // if (!room) {
+    //   throw new Error('Room not set');
+    // }
+    const players = rooms[room].players.map((player) => player.name);
+    console.log(players)
+    socket.emit('players', players);
   });
 
   socket.on('setName', (name: string) => {
