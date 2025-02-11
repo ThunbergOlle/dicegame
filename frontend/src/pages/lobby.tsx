@@ -45,12 +45,14 @@ export default function Lobby() {
       <h1>{roomName}</h1>
       <button onClick={() => startGame()}>Start Game</button>
       <h2>Players:</h2>
-      {players.length > 0 && (
+      {players.length > 0 ? (
         players.map((player, index) => (
-        <div key={player.name + index}>
-          <p>{player.name}</p>
-        </div>
+          <div key={player.name + index}>
+            <p>{player.name}</p>
+          </div>
         ))
+      ) : (
+        <div>Loading...</div>
       )}
     </div>
   );
