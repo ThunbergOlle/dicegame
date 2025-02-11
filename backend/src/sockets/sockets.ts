@@ -10,8 +10,8 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     console.log('User disconnected');
   });
 
-  socket.on('joinRoom', (dataPacket: {joinRoom: string; userName: string}) => {
-    const { joinRoom, userName } = dataPacket;
+  socket.on('joinRoom', (joinRoomData: {joinRoom: string; userName: string}) => {
+    const { joinRoom, userName } = joinRoomData;
     room = joinRoom;
     socket.join(joinRoom);
 
