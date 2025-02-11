@@ -16,7 +16,7 @@ export default function Lobby() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    socket.emit('getPlayers');
+    socket.emit('getPlayers', roomName);
 
     function onPlayers(recievedPlayers: Player[]) {
       console.log("Recieved Players: ", recievedPlayers);

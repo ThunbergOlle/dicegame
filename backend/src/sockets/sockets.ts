@@ -10,8 +10,9 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     console.log('User disconnected');
   });
 
-  socket.on('joinRoom', (joinRoomData: {joinRoom: string; userName: string}) => {
-    const { joinRoom, userName } = joinRoomData;
+  socket.on('joinRoom', (joinRoomData: {roomName: string; userName: string}) => {
+    const joinRoom = joinRoomData.roomName;
+    const userName = joinRoomData.userName;
     room = joinRoom;
     socket.join(joinRoom);
 
@@ -31,15 +32,16 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     socket.emit('rooms', Object.keys(rooms));
   });
 
-  socket.on('getPlayers', () => {
-    // if (!room) {
-    //   throw new Error('Room not set');
-    // }
-    const players = rooms[room].players.map((player) => ({
+  socket.on('getPlayers', (roomName: string) => {
+    if (!rooms[roomName]) {
+      console.error("Room not found:", roomName);
+      return;
+    }
+    const players = rooms[roomName].players.map((player) => ({
       name: player.name,
       dice: player.dice,
     }));
-    console.log(players)
+    console.log(players);
     socket.emit('players', players);
   });
 
