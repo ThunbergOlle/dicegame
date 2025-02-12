@@ -26,6 +26,7 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
     }
 
     rooms[joinRoom].addPlayer(new Player(userName, socket));
+    // io.emit('roomUpdate', rooms[joinRoom].players);
   });
 
   socket.on('getRooms', () => {
@@ -42,7 +43,7 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
       dice: player.dice,
     }));
     console.log(players);
-    socket.emit('players', players);
+    io.in(roomName).emit('players', players);
   });
 
   socket.on('setName', (name: string) => {
