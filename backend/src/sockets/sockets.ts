@@ -2,15 +2,30 @@ import * as socketio from 'socket.io';
 import { Game } from '../game';
 import { Player } from '../game';
 
+function updatePlayers(rooms: { [key: string]: Game }, roomName: string) {
+  const players = rooms[roomName].players.map((player) => ({
+    name: player.name,
+    dice: player.dice,
+  }));
+  return players
+}
+
 export default function sockets(socket: socketio.Socket, io: socketio.Server, rooms: { [key: string]: Game }) {
   let room: string;
   console.log('User connected');
 
   socket.on('disconnect', async () => {
     console.log('User disconnected');
+    if (room && rooms[room]) {
+      rooms[room].removePlayer(socket.id);
+      const players = updatePlayers(rooms, room)
+      io.in(room).emit('players', players);
+    }
   });
 
-  socket.on('joinRoom', (joinRoom: string) => {
+  socket.on('joinRoom', (joinRoomData: {roomName: string; userName: string}) => {
+    const joinRoom = joinRoomData.roomName;
+    const userName = joinRoomData.userName;
     room = joinRoom;
     socket.join(joinRoom);
 
@@ -23,11 +38,20 @@ export default function sockets(socket: socketio.Socket, io: socketio.Server, ro
       throw new Error('Game already started');
     }
 
-    rooms[joinRoom].addPlayer(new Player('Player', socket));
+    rooms[joinRoom].addPlayer(new Player(userName, socket));
   });
 
   socket.on('getRooms', () => {
     socket.emit('rooms', Object.keys(rooms));
+  });
+
+  socket.on('getPlayers', (roomName: string) => {
+    if (!rooms[roomName]) {
+      console.error("Room not found:", roomName);
+      return;
+    }
+    const players = updatePlayers(rooms, room)
+    io.in(roomName).emit('players', players);
   });
 
   socket.on('setName', (name: string) => {

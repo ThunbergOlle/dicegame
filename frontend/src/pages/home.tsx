@@ -32,7 +32,7 @@ export default function Home() {
     if (!userName) {
       return;
     }
-    socket.emit('joinRoom', roomName);
+    socket.emit('joinRoom', { roomName, userName } );
     navigate('/lobby', { state: { roomName, userName } });
   }
 

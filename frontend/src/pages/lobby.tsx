@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
 
 interface Player {
   name: string;
+  socket: Socket;
   dice: [number, number, number, number, number];
 }
 
@@ -14,11 +16,16 @@ export default function Lobby() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    socket.emit('getPlayers');
+    socket.emit('getPlayers', roomName);
 
-    function onPlayers(players: Player[]) {
-      console.log(players);
-      setPlayers(players);
+    function onPlayers(recievedPlayers: Player[]) {
+      console.log("Recieved Players: ", recievedPlayers);
+      if (recievedPlayers && recievedPlayers.length > 0) {
+        setPlayers(recievedPlayers);
+      }
+      else{
+        console.log("No recieved Players");
+      }
     }
 
     socket.on('players', onPlayers);
@@ -38,9 +45,15 @@ export default function Lobby() {
       <h1>{roomName}</h1>
       <button onClick={() => startGame()}>Start Game</button>
       <h2>Players:</h2>
-         {players.map((player: Player, index: any) => (
-          <div key={index}>{player.name}</div>
-         ))}
+      {players.length > 0 ? (
+        players.map((player, index) => (
+          <div key={player.name + index}>
+            <p>{player.name}</p>
+          </div>
+        ))
+      ) : (
+        <div>Loading...</div>
+      )}
     </div>
   );
 }
